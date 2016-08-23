@@ -1,2 +1,2 @@
 # bt3
-Rust behaviour tree
+Rust simple behaviour tree

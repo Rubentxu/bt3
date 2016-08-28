@@ -1,6 +1,8 @@
 use BlackBoard:: *;
 
 
+pub struct Context {}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Status {
     NONE,
@@ -19,7 +21,7 @@ pub enum NodeCategorie {
 }
 
 trait Node {
-    fn id(&self) -> &'static str;
+    fn id(&self) -> &String;
 
     fn category(&self) -> NodeCategorie;
 
@@ -51,12 +53,12 @@ trait Node {
 
 #[derive(Debug)]
 pub struct TriggerAction {
-    id: &'static str,
+    id: String,
     status: Status,
 }
 
 impl TriggerAction {
-    fn new(_id: &'static str, _status: Status) -> Self {
+    fn new(_id: String, _status: Status) -> Self {
         TriggerAction {
             id: _id,
             status: _status,
@@ -65,8 +67,8 @@ impl TriggerAction {
 }
 
 impl Node for TriggerAction {
-    fn id(&self) -> &'static str {
-        self.id
+    fn id(&self) -> &String {
+        &self.id
     }
 
 
@@ -81,14 +83,14 @@ impl Node for TriggerAction {
 
 #[derive(Debug)]
 pub struct ToggleAction {
-    id: &'static str,
+    id: String,
     enabled: Status,
     disabled: Status,
     current: Status,
 }
 
 impl ToggleAction {
-    fn new(_id: &'static str, _enabled: Status, _disabled: Status, _current: Status) -> Self {
+    fn new(_id: String, _enabled: Status, _disabled: Status, _current: Status) -> Self {
         ToggleAction {
             id: _id,
             enabled: _enabled,
@@ -99,8 +101,8 @@ impl ToggleAction {
 }
 
 impl Node for ToggleAction {
-    fn id(&self) -> &'static str {
-        self.id
+    fn id(&self) -> &String {
+        &self.id
     }
 
     fn category(&self) -> NodeCategorie {
@@ -110,4 +112,20 @@ impl Node for ToggleAction {
     fn tick(&self, context: &Context) -> Status {
         self.current
     }
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use Node::Node;
+
+    #[test]
+    fn triggerAction_test() {
+        let action = TriggerAction::new("idTrigger".to_string(), Status::RUNNING);
+        assert_eq!(action.tick(&Context {}), Status::RUNNING);
+    }
+
+
 }

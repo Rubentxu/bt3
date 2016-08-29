@@ -1,7 +1,7 @@
 use BlackBoard:: *;
+use BehaviourTree::*;
+use std::collections::HashSet;
 
-
-pub struct Context {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Status {
@@ -20,27 +20,16 @@ pub enum NodeCategorie {
     CONDITION,
 }
 
-trait Node {
+pub trait ID {
     fn id(&self) -> &String;
+}
 
+pub trait Tickable {
+    fn tick(&self, context: &Context) -> Status;
+}
+
+pub trait Node: Tickable + ID + PartialEq + Eq  {
     fn category(&self) -> NodeCategorie;
-
-    fn tick(&self, context: &Context) -> Status {
-        Status::NONE
-    }
-
-    fn execute(&self, context: &Context) -> Status {
-        self.enter(context);
-
-        let status = self.tick(context);
-
-        if let Status::RUNNING = status {
-            self.close(context);
-        }
-
-        self.exit(context);
-        status
-    }
 
     fn open(&self, context: &Context) {}
 
@@ -50,6 +39,7 @@ trait Node {
 
     fn exit(&self, context: &Context) {}
 }
+
 
 #[derive(Debug)]
 pub struct TriggerAction {
@@ -66,16 +56,19 @@ impl TriggerAction {
     }
 }
 
-impl Node for TriggerAction {
+impl ID for TriggerAction {
     fn id(&self) -> &String {
         &self.id
     }
+}
 
-
+impl Node for TriggerAction {
     fn category(&self) -> NodeCategorie {
         NodeCategorie::ACTION
     }
+}
 
+impl Tickable for TriggerAction {
     fn tick(&self, context: &Context) -> Status {
         self.status
     }
@@ -100,31 +93,33 @@ impl ToggleAction {
     }
 }
 
-impl Node for ToggleAction {
+impl ID for ToggleAction {
     fn id(&self) -> &String {
         &self.id
     }
+}
 
+impl Node for ToggleAction {
     fn category(&self) -> NodeCategorie {
         NodeCategorie::ACTION
     }
+}
 
+impl Tickable for ToggleAction {
     fn tick(&self, context: &Context) -> Status {
         self.current
     }
 }
 
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use Node::Node;
 
     #[test]
     fn triggerAction_test() {
         let action = TriggerAction::new("idTrigger".to_string(), Status::RUNNING);
-        assert_eq!(action.tick(&Context {}), Status::RUNNING);
+        //assert_eq!(action.tick(&Context {}), Status::RUNNING);
     }
 
 

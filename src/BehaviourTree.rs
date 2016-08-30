@@ -1,39 +1,40 @@
 use BlackBoard::*;
 use Node::*;
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 pub trait Entity {
     // add code here
-} 
+}
 
 
 pub struct Context<'a> {
     pub blackBoard: &'a BlackBoard,
-    pub currentOpenNodes: HashSet<Node>,
-    pub lastOpenNodes: HashSet<Node>
+    pub currentOpenNodes: HashMap<String, &'a Node>,
+    pub lastOpenNodes: HashMap<String, &'a Node>,
 }
 
-pub trait BehaviourTree {
-    fn tick(&self, context: &Context, root: &Node) -> Status {
-        let status: Status = self.execute(context, root);
+pub struct BehaviourTree {
+    id: String,
+    root: Node,
+}
+
+
+impl BehaviourTree {
+    fn tick(&self, context: &mut Context) -> Status {
+        let status: Status = self.root.execute(context);
        
-        for node in context.lastOpenNodes.intersection(&context.currentOpenNodes) {
-        	node.close(context);
-        }
+        context.lastOpenNodes
+            .iter()
+            .filter(|&(key, node)| context.currentOpenNodes.contains_key(key))
+            .map(|(key, node)| node.close(context));
 
-        status
-    }
 
-    fn execute(&self, context: &Context, node: &Node) -> Status {
-        node.enter(context);
+        context.lastOpenNodes.clear();
+        
+        let mut openNodes: Vec<(String, &Node)> = context.currentOpenNodes.drain().collect();
 
-        let status = node.tick(context);
+        openNodes.iter().map(|&(ref key, ref node)| context.lastOpenNodes.insert(key.clone(), node.clone()));    
 
-        if let Status::RUNNING = status {
-            node.close(context);
-        }
-
-        node.exit(context);
         status
     }
 }

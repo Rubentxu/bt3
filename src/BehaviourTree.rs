@@ -22,7 +22,7 @@ pub struct BehaviourTree {
 impl BehaviourTree {
     fn tick(&self, context: &mut Context) -> Status {
         let status: Status = self.root.execute(context);
-       
+
         context.lastOpenNodes
             .iter()
             .filter(|&(key, node)| context.currentOpenNodes.contains_key(key))
@@ -30,10 +30,11 @@ impl BehaviourTree {
 
 
         context.lastOpenNodes.clear();
-        
+
         let mut openNodes: Vec<(String, &Node)> = context.currentOpenNodes.drain().collect();
 
-        openNodes.iter().map(|&(ref key, ref node)| context.lastOpenNodes.insert(key.clone(), node.clone()));    
+        openNodes.iter()
+            .map(|&(ref key, ref node)| context.lastOpenNodes.insert(key.clone(), node.clone()));
 
         status
     }

@@ -1,43 +1,47 @@
-use BehaviourTree:: *;
 use std::collections::HashMap;
 
 
 #[derive(Debug, PartialEq, Eq, Hash, Default)]
 pub struct MemoryScope {
-    baseScope: String,
-    treeScope: String,
-    nodeScope: String,
+    base_scope: String,
+    tree_scope: String,
+    node_scope: String,
     param: String,
 }
 
+
 impl MemoryScope {
-    fn base(baseScope: &str, param: &str) -> MemoryScope {
+    #[allow(dead_code)]
+    fn base(base_scope: &str, param: &str) -> MemoryScope {
         MemoryScope {
-            baseScope: baseScope.to_string(),
+            base_scope: base_scope.to_string(),
             param: param.to_string(),
             ..Default::default()
         }
     }
 
-    fn tree(baseScope: &str, treeScope: &str, param: &str) -> MemoryScope {
+    #[allow(dead_code)]
+    fn tree(base_scope: &str, tree_scope: &str, param: &str) -> MemoryScope {
         MemoryScope {
-            baseScope: baseScope.to_string(),
-            treeScope: treeScope.to_string(),
+            base_scope: base_scope.to_string(),
+            tree_scope: tree_scope.to_string(),
             param: param.to_string(),
             ..Default::default()
         }
     }
 
-    fn node(baseScope: &str, treeScope: &str, nodeScope: &str, param: &str) -> MemoryScope {
+    #[allow(dead_code)]
+    fn node(base_scope: &str, tree_scope: &str, node_scope: &str, param: &str) -> MemoryScope {
         MemoryScope {
-            baseScope: baseScope.to_string(),
-            treeScope: treeScope.to_string(),
-            nodeScope: nodeScope.to_string(),
+            base_scope: base_scope.to_string(),
+            tree_scope: tree_scope.to_string(),
+            node_scope: node_scope.to_string(),
             param: param.to_string(),
         }
     }
 }
 
+#[allow(non_camel_case_types)]
 #[derive(Debug, PartialEq, Eq)]
 pub enum MemoryParams {
     Type_String(String),
@@ -74,11 +78,11 @@ mod tests {
     #[test]
     fn blackboard_scope_tree_test() {
         let mut blackboard: BlackBoard = BlackBoard::new();
-        let scope = MemoryScope::tree("baseScope", "treeScope", "test");
+        let scope = MemoryScope::tree("base_scope", "tree_scope", "test");
 
         blackboard.insert(scope, MemoryParams::Type_Int(2));
 
-        let item = blackboard.get(&MemoryScope::tree("baseScope", "treeScope", "test"));
+        let item = blackboard.get(&MemoryScope::tree("base_scope", "tree_scope", "test"));
         let result;
         match item {
             Some(&MemoryParams::Type_Int(i)) => result = i,
@@ -91,11 +95,11 @@ mod tests {
     #[test]
     fn blackboard_scope_node_test() {
         let mut blackboard: BlackBoard = BlackBoard::new();
-        let scope = MemoryScope::node("baseScope", "treeScope", "nodeScope", "test");
+        let scope = MemoryScope::node("base_scope", "tree_scope", "node_scope", "test");
 
         blackboard.insert(scope, MemoryParams::Type_String("Pruebas".to_string()));
 
-        let item = blackboard.get(&MemoryScope::node("baseScope", "treeScope", "nodeScope", "test"));
+        let item = blackboard.get(&MemoryScope::node("base_scope", "tree_scope", "node_scope", "test"));
         let mut result = "";
         if let Some(&MemoryParams::Type_String(ref i)) = item {
             result = i;

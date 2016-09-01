@@ -1,3 +1,3 @@
-pub mod BlackBoard;
-pub mod Node;
-pub mod BehaviourTree;
+pub mod blackboard;
+pub mod node;
+pub mod behaviour_tree;

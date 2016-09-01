@@ -1,7 +1,5 @@
-use BlackBoard:: *;
-use BehaviourTree::*;
-use std::collections::HashSet;
-use std::hash::Hash;
+use behaviour_tree::*;
+use std::fmt::Debug;
 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,15 +24,16 @@ pub trait ID {
 }
 
 
-pub trait Node: ID {
+pub trait Node: ID + Debug {
     fn category(&self) -> NodeCategorie;
 
+    #[allow(unused_variables)]
     fn open(&self, context: &Context) {}
-
+    #[allow(unused_variables)]
     fn close(&self, context: &Context) {}
-
+    #[allow(unused_variables)]
     fn enter(&self, context: &Context) {}
-
+    #[allow(unused_variables)]
     fn exit(&self, context: &Context) {}
 
     fn tick(&self, context: &Context) -> Status;
@@ -51,7 +50,6 @@ pub trait Node: ID {
         self.exit(context);
         status
     }
-
 }
 
 
@@ -81,6 +79,7 @@ impl Node for TriggerAction {
         NodeCategorie::ACTION
     }
 
+    #[allow(unused_variables)]
     fn tick(&self, context: &Context) -> Status {
         self.status
     }
@@ -117,7 +116,8 @@ impl Node for ToggleAction {
         NodeCategorie::ACTION
     }
 
-     fn tick(&self, context: &Context) -> Status {
+    #[allow(unused_variables)]
+    fn tick(&self, context: &Context) -> Status {
         self.current
     }
 }

@@ -21,25 +21,21 @@ pub struct BehaviourTree<T: Node + ?Sized> {
 
 impl<T: Node + ?Sized> BehaviourTree<T> {
     fn tick(&self, context: &mut Context) -> Status {
+        use std::mem;
         let status: Status = self.root.execute(context);
 
-        {
-        	context.last_open_nodes
+        println!("contiene2 {:?} ", context.current_open_nodes);
+        context.last_open_nodes
             .iter()
             .filter(|&(key, node)| !context.current_open_nodes.contains_key(key))
-            .map(|(_, node)| node.close(context)); 
-        }
+            .map(|(key, node)| node.close(context));
+
 
         context.last_open_nodes.clear();
-		
+        mem::swap(&mut context.last_open_nodes, &mut context.current_open_nodes);
 
-        context.current_open_nodes.drain()
-            .map(|(ref key, ref node)| {
-            	println!("contiene2 {:?} ", node);
-            	context.last_open_nodes.insert(key.clone(), node.clone());
-        });
-
-		println!("contiene4 {:?} ", context.last_open_nodes);
+        println!("contiene3 {:?} ", context.current_open_nodes);
+        println!("contiene4 {:?} ", context.last_open_nodes);
         status
     }
 }
@@ -137,7 +133,7 @@ mod tests {
             blackboard: &BlackBoard::new(),
         };
         context.current_open_nodes.insert("Test2".to_string(), &node);
-        println!("{:?} contiene", context.current_open_nodes);
+        println!("contiene {:?} ", context.current_open_nodes);
 
         assert_eq!(bt.tick(&mut context), Status::RUNNING);
 

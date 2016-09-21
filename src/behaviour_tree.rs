@@ -24,18 +24,14 @@ impl<T: Node + ?Sized> BehaviourTree<T> {
         use std::mem;
         let status: Status = self.root.execute(context);
 
-        println!("contiene2 {:?} ", context.current_open_nodes);
         context.last_open_nodes
             .iter()
             .filter(|&(key, node)| !context.current_open_nodes.contains_key(key))
             .map(|(key, node)| node.close(context));
 
-
         context.last_open_nodes.clear();
         mem::swap(&mut context.last_open_nodes, &mut context.current_open_nodes);
 
-        println!("contiene3 {:?} ", context.current_open_nodes);
-        println!("contiene4 {:?} ", context.last_open_nodes);
         status
     }
 }
@@ -73,6 +69,7 @@ mod tests {
     #[derive(Debug)]
     struct NodeTest2 {
         id: String,
+        check: bool
     }
 
     impl ID for NodeTest2 {
@@ -91,6 +88,7 @@ mod tests {
         }
 
         fn close(&self, context: &Context) {
+
             println!("{:?} has", context.current_open_nodes);
         }
     }
@@ -125,7 +123,7 @@ mod tests {
             root: NodeTest { id: "Test".to_string() },
         };
 
-        let node = NodeTest2 { id: "Test2".to_string() };
+        let node = NodeTest2 { id: "Test2".to_string(), check: false };
 
         let mut context = Context {
             current_open_nodes: HashMap::new(),
@@ -139,6 +137,7 @@ mod tests {
 
         assert_eq!(context.last_open_nodes.len(), 1);
         assert!(context.last_open_nodes.contains_key("Test2"));
+        assert!(node.check);
     }
 
 
